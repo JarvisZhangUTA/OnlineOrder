@@ -1,0 +1,37 @@
+html
+  head
+    meta(http-equiv = 'Content-Type', content = 'text/html; charset=UTF-8')
+    title='New Order'
+    body
+      h3 Order Information
+      p ID: #{order._id}
+      p Date: #{order.createAt}
+      p phone: #{order.phone}
+      p Items:
+      ul
+        - for (var i = 0; i < order.item.length; ++i) {
+          li 
+            p #{order.item[i].name} * #{order.item[i].count}
+            p #{order.item[i].addition}
+        - } 
+      p tax: #{order.tax}
+      p total: #{order.total}
+      p Address:
+      ul
+        li #{order.address.line1}
+        - if (order.address.line2)
+          li #{order.address.line2}
+        - if (order.address.zipcode || order.address.city)
+          li #{order.address.zipcode} #{order.address.city}
+      p Payment:
+      ul
+        - if (!order.payment.card)
+          | Cash
+        - else
+          li Card: #{order.payment.card}
+          li Name: #{order.payment.name}
+          li expiry: #{order.payment.expiry}
+          li CVC: #{order.payment.CVC} 
+
+      
+    

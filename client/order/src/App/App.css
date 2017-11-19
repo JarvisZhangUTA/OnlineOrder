@@ -1,0 +1,19 @@
+
+.dark-toast{
+  background: #323232;
+  color: #fff;
+}
+
+.green-toast{
+  background: #4CAF50;
+  color: #fff;
+}
+
+
+.input-info{
+  margin: 0 10px;
+}
+
+#card-wrapper {
+  overflow: hidden;
+}

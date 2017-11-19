@@ -1,0 +1,4 @@
+{
+    "mongodb_uri": "mongodb://localhost:27017/OnlineOrder",
+    "jwt_secret": "y1IojcEHCV_4z3ySfDpCnB-eugu_jESTDSkrNQne1fZoDaznqJ8C38WWmTHN9wo0"
+}

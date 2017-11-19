@@ -1,0 +1,17 @@
+.header-image-section {
+    width: 100%;
+    background: #E0E0E0;
+    color: #757575;
+}
+
+.pre-section {
+    border: 1px dashed teal;
+    padding: 20px;
+    min-height:300px;
+    height: 300px;
+    height: auto !important;
+}
+
+p {
+    color: rgba(0,0,0,0.71);
+}
