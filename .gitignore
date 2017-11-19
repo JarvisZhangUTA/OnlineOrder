@@ -1,0 +1,4 @@
+./client/main/node_modules
+./client/dashboard/node_modules
+./client/order/node_modules
+./server/node_modules
