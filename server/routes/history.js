@@ -39,7 +39,8 @@ router.post('/placeorder', function(req, res, next) {
 
 router.post('/query',auth.verifyToken, function(req, res, next) {
     console.log(req.body.startDate + ' ' + req.body.endDate);
-    Order.find({  createAt: { $gte: req.body.startDate, $lte: req.body.endDate} }, (err, list) => {
+    Order.find({ business: req.body.id, createAt: { $gte: req.body.startDate, $lte: req.body.endDate} }, 
+        (err, list) => {
         res.json(list);
     })
 });

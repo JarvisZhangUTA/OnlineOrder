@@ -150,6 +150,13 @@ class Business extends Component {
         fetch(request)
             .then((res) => res.json())
             .then((business) => {
+                if(!business.location){
+                    business.location = {
+                        address: '',
+                        lat: 0,
+                        lng: 0
+                    }
+                }
                 this.setState({
                     business: business
                 });

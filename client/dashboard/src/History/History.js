@@ -114,6 +114,8 @@ class History extends React.Component {
     }
 
     loadOrders() {
+        const id = localStorage.getItem('id');
+
         const url = 'http://' + window.location.hostname + ':' + window.location.port + '/history/query';
         const token = localStorage.getItem('token');
 
@@ -128,7 +130,7 @@ class History extends React.Component {
                 'Content-Type': 'application/json',
                 'Authorization': 'XXX ' + token
             },
-            body: JSON.stringify({startDate: startDate, endDate: endDate})
+            body: JSON.stringify({id: id, startDate: startDate, endDate: endDate})
         }).then(response=>{
             if(response.status === 200){
                 response.json().then((res)=>{
