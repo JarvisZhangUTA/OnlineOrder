@@ -19,6 +19,8 @@ class App extends Component {
           business: {
             name: '',
             email: '',
+            phone: '',
+            location: {address: ''},
             item: []
           },
           order: {
@@ -147,6 +149,13 @@ class App extends Component {
       fetch(request)
           .then((res) => res.json())
           .then((business) => {
+
+              if(!business.location){
+                business.location = {
+                  address: ''
+                };
+              }
+
               this.setState({
                   business: business
               });
@@ -278,12 +287,21 @@ class App extends Component {
   }
 
   render() {
+    const arr = window.location.href.split('/');
+    const id = arr[arr.length - 1];
+    const url = 'http://' + window.location.hostname + ':' + window.location.port + '/' + id;
+    
     return (
       <div className="container">
         <div className="card red accent-2">
           <div className="card-content white-text">
-            <h4>{this.state.business.name}</h4>
-            <p>Contact with {this.state.business.email} for more information.</p>
+            <h4>
+              <a href={url}>
+                {this.state.business.name}
+              </a>
+            </h4>
+            <p>{this.state.business.location.address}</p>
+            <p>Contact with {this.state.business.phone} for more information.</p>
           </div>
           <div className="card-tabs">
             <ul className="tabs tabs-fixed-width tabs-transparent">

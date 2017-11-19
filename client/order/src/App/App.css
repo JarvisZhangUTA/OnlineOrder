@@ -17,3 +17,11 @@
 #card-wrapper {
   overflow: hidden;
 }
+
+a {
+  color: white;
+}
+
+a :hover {
+  color: black;
+}

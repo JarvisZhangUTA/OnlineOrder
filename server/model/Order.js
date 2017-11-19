@@ -22,7 +22,7 @@ var schema = new mongoose.Schema({
         card: String,
         name: String,
         expiry: String,
-        CVC: Number
+        CVC: String
     },
     createAt: { type: Date, default: Date.now }
 },{collection: 'Order'});
