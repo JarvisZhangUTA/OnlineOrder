@@ -167,7 +167,6 @@ class Account extends React.Component {
                             <input disabled id="email" type="email" name="email"
                                     className="validate" 
                                     value={this.state.business.email}/>
-                            <label for="email">Email</label>
                         </div>
 
                         <div className="input-field">
