@@ -101,6 +101,7 @@ class Business extends Component {
                             </div>
                             <div className="col s12 m8">
                                 <Map 
+                                    key = {this.state.business.location.lat}
                                     lat = {this.state.business.location.lat}
                                     lng = {this.state.business.location.lng}/>
                             </div>
