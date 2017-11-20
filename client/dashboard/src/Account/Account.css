@@ -5,3 +5,8 @@ a {
 button {
     margin: 10px 0;
 }
+
+.short-input{
+    max-width: 300px;
+    width: 300px;
+}

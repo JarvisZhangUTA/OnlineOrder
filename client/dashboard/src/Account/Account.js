@@ -13,6 +13,7 @@ class Account extends React.Component {
             business: {
                 _id: '',
                 email: '',
+                index: '',
                 name: '',
                 password: '',
                 notification: []
@@ -29,6 +30,7 @@ class Account extends React.Component {
         this.removeNotify = this.removeNotify.bind(this);
         this.changeNotify = this.changeNotify.bind(this);
         this.changeName = this.changeName.bind(this);
+        this.changeIndex = this.changeIndex.bind(this);
         this.changePassword = this.changePassword.bind(this);
         this.updateBusiness = this.updateBusiness.bind(this);
 
@@ -62,6 +64,14 @@ class Account extends React.Component {
     changeName(event) {
         const business = this.state.business;
         business.name = event.target.value;
+        this.setState({
+            business: business
+        });
+    }
+
+    changeIndex(event) {
+        const business = this.state.business;
+        business.index = event.target.value;
         this.setState({
             business: business
         });
@@ -129,9 +139,6 @@ class Account extends React.Component {
     }
 
     render() {
-        const url = 'http://' + window.location.hostname + ':' + window.location.port + 
-                        '/order/' + this.state.business._id;
-
         const email_list = this.state.business.notification.map(
             (email) => {
                 return (
@@ -146,14 +153,34 @@ class Account extends React.Component {
             }
         );
 
+        const url = 'http://' + window.location.hostname + ':' + window.location.port + '/';
         
         return (
             <div className="container">
                 <br/>
                 <div className="card hoverable">
                     <div className="card-content">
-                        <span class="card-title">Use this link for promotion:</span>
-                        <a href={url}>{url}</a>
+                        <span class="card-title">Your links:</span>
+                        <p>
+                            Website:&nbsp;&nbsp;
+                            <span className="teal-text"> {url} </span>
+                            <input id="index" type="text"
+                                        onChange={this.changeIndex}
+                                        className="teal-text short-input" 
+                                        value={this.state.business.index}/>
+                            &nbsp;&nbsp;
+                            <a href={url + this.state.business.index}>GO</a>
+                        </p>
+                        <p>
+                            Order:&nbsp;&nbsp;
+                            <span className="teal-text"> {url + 'order/'} </span>
+                            <input id="index" type="text"
+                                        onChange={this.changeIndex}
+                                        className="teal-text short-input" 
+                                        value={this.state.business.index}/>
+                            &nbsp;&nbsp;
+                            <a href={url + 'order/' + this.state.business.index}>GO</a>
+                        </p>
                     </div>
                 </div>
 

@@ -142,8 +142,8 @@ class App extends Component {
 
   loadBusiness() {
       const arr = window.location.href.split('/');
-      const id = arr[arr.length - 1];
-      const url = 'http://' + window.location.hostname + ':' + window.location.port + '/business/info/' + id;
+      const index = arr[arr.length - 1];
+      const url = 'http://' + window.location.hostname + ':' + window.location.port + '/business/index/' + index;
       const request = new Request(url, {method: 'GET'});
 
       fetch(request)
@@ -288,8 +288,8 @@ class App extends Component {
 
   render() {
     const arr = window.location.href.split('/');
-    const id = arr[arr.length - 1];
-    const url = 'http://' + window.location.hostname + ':' + window.location.port + '/' + id;
+    const index = arr[arr.length - 1];
+    const url = 'http://' + window.location.hostname + ':' + window.location.port + '/' + index;
     
     return (
       <div className="container">

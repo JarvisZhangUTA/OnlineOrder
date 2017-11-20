@@ -3,7 +3,7 @@ import Business from './Business/Business';
 
 const Routes = [    
     {path: '/', component: Home},
-    {path: '/:id', component: Business},
+    {path: '/:index', component: Business},
 ];
 
 export default Routes;

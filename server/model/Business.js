@@ -3,6 +3,10 @@ var bcrypt = require('bcrypt');
 
 var schema = new mongoose.Schema({
     name: String,
+    index:{
+        type: String,
+        index: {unique: true}
+    },
     email:{
         type: String,
         index: {unique: true}

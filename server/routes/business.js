@@ -36,6 +36,7 @@ router.post('/signup', function(req, res, next) {
                 password: req.body.password
             };
             const business = new Business(data);
+            business.index = business._id;
 
             business.save((err) => {
                 if (err) {
@@ -60,17 +61,47 @@ router.get('/info/:id', function(req, res, next) {
     });
 });
 
+router.get('/index/:index', function(req, res, next) {
+    const index = req.params.index;
+
+    Business.findOne({'index': index}, (err, business)=>{
+        if(!business) {
+            res.status(400).json({error: 'account not found'});
+        } else {
+            res.json(business);
+        }
+    });
+});
+
 router.post('/update', auth.verifyToken ,function(req, res, next) {
     const new_business = req.body;
     delete new_business.__v;
 
     Business.findById(new_business._id, function (err, business) {
-        if (err) return handleError(err);
-        business.set(new_business);
-        business.save(function (err, updatedBusiness) {
-          if (err) return handleError(err);
-          res.json(updatedBusiness);
+        if (err){
+            res.status(400).json({error: err});
+            return handleError(err);
+        }
+
+        Business.find({'index': new_business.index}, (err, data)=>{
+            if(data.length > 1) {
+                res.status(400).json({error: 'Link index is taken'});
+                return;
+            }else if(data.length == 1 && data[0]._id !== business._id) {
+                res.status(400).json({error: 'Link index is taken'});
+                return;
+            }
+
+            business.set(new_business);
+            business.save(function (err, updatedBusiness) {
+                if (err){
+                    res.status(400).json({error: err});
+                    return handleError(err);
+                }
+              res.json(updatedBusiness);
+            });
         });
+    
     });
 });
 

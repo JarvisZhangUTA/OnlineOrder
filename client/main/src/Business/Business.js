@@ -14,6 +14,7 @@ class Business extends Component {
         this.state = {
             business: {
                 _id: '',
+                index: '',
                 image: '',
                 phone: '',
                 name: '',
@@ -46,7 +47,7 @@ class Business extends Component {
                     </a>
                     <ul className="right hide-on-med-and-down">
                         <li>
-                            <a href={'/order/' + this.state.business._id}>OnlineOrder</a>
+                            <a href={'/order/' + this.state.business.index}>OnlineOrder</a>
                         </li>
                     </ul>
                 </div>
@@ -65,7 +66,7 @@ class Business extends Component {
                     <div className="col s12 m4">
                         <div className="row">
                             <a class="col s10 offset-s1 waves-effect waves-light btn orange" 
-                                href={'/order/' + this.state.business._id}>
+                                href={'/order/' + this.state.business.index}>
                                 Order Online
                             </a>
                         </div>
@@ -119,7 +120,7 @@ class Business extends Component {
                             <h5 class="white-text">Links</h5>
                             <ul>
                             <li>
-                                <a class="grey-text text-lighten-3" href={'/order/' + this.state.business._id}>
+                                <a class="grey-text text-lighten-3" href={'/order/' + this.state.business.index}>
                                     OrderOnline
                                 </a>
                             </li>
@@ -143,8 +144,8 @@ class Business extends Component {
 
     loadBusiness() {
         const arr = window.location.href.split('/');
-        const id = arr[arr.length - 1];
-        const url = 'http://' + window.location.hostname + ':' + window.location.port + '/business/info/' + id;
+        const index = arr[arr.length - 1];
+        const url = 'http://' + window.location.hostname + ':' + window.location.port + '/business/index/' + index;
         const request = new Request(url, {method: 'GET'});
   
         fetch(request)
