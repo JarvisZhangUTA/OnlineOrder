@@ -184,19 +184,9 @@ class Info extends React.Component {
             </div>
         );
 
-        const url = 'http://' + window.location.hostname + ':' + window.location.port + 
-        '/' + this.state.business._id;
-
         return (
             <div className="container">
                 <br/>
-
-                <div className="card hoverable">
-                    <div className="card-content">
-                        <span class="card-title">This is your own website:</span>
-                        <a href={url}>{url}</a>
-                    </div>
-                </div>
 
                 <div className="card">
                     <div className="card-content">
