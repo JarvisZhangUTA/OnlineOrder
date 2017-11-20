@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 
 var schema = new mongoose.Schema({
-    phone: Number,
+    phone: String,
     business: String,
     item:[{
         name: String,

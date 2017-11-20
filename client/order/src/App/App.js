@@ -70,7 +70,7 @@ class App extends Component {
         return;
       }
 
-      if(!validator.isMobilePhone(order.phone, 'any')) {
+      if(!validator.isMobilePhone(order.phone, 'en-US')) {
         toast('Check your phone number');
         return;
       }
@@ -163,6 +163,24 @@ class App extends Component {
   }
 
   changePhone(phone) {
+
+    if(validator.isMobilePhone(phone, 'en-US')) {
+      const order = this.state.order;
+      const url = 'http://' + window.location.hostname + ':' + window.location.port + 
+                  '/history/record/' + phone;
+      const request = new Request(url, {method: 'GET'});
+      fetch(request)
+        .then((res) => res.json())
+        .then((record) => {
+          if(record) {
+            order.address = record.address;
+            order.payment = record.payment;
+            console.log(order);
+            this.setState({order});
+          }
+        });
+    }
+
     const order = this.state.order;
     order.phone = phone;
     this.setState({order});
@@ -476,6 +494,7 @@ class App extends Component {
         <input placeholder="Card number" type="text" name="CCnumber" 
           value={this.state.order.payment.card} onChange={(e) => this.changeCard(e.target.value)}/>
         <input placeholder="MM/YY" type="text" name="CCexpiry" 
+          value={this.state.order.payment.expiry}
           onChange={(e) => this.changeExpiry(e.target.value)}/>
         <input placeholder="CVC" type="text" name="CCcvc" 
           onChange={(e) => this.changeCVC(e.target.value)}/>

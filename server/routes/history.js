@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var Business = require('mongoose').model('Business');
 var Order = require('mongoose').model('Order');
+var Record = require('mongoose').model('Record');
 var auth = require('../utils/auth');
 
 router.post('/placeorder', function(req, res, next) {
@@ -31,6 +32,7 @@ router.post('/placeorder', function(req, res, next) {
                     }
 
                     res.json(order);
+                    saveRecord(order);
                 });
             });
         }
@@ -38,11 +40,47 @@ router.post('/placeorder', function(req, res, next) {
 });
 
 router.post('/query',auth.verifyToken, function(req, res, next) {
-    console.log(req.body.startDate + ' ' + req.body.endDate);
     Order.find({ business: req.body.id, createAt: { $gte: req.body.startDate, $lte: req.body.endDate} }, 
         (err, list) => {
         res.json(list);
     })
 });
+
+router.get('/record/:phone', function(req, res, next) {
+    const phone = req.params.phone;
+    Record.findOne({'phone': phone}, (err, record)=>{
+        if(record) {
+            res.json(record);
+        } else {
+            res.json({});
+        }
+    });
+});
+
+function saveRecord(order) {
+    Record.findOne({'phone': order.phone}, (err, record)=>{
+        delete order.payment.CVC;
+        const data = {
+            phone: order.phone,
+            address: order.address,
+            payment: order.payment
+        };
+
+        if(record) {
+            if(order.address.line1 !== 'Pick up') {
+                record.address = order.address;
+            }
+
+            if(order.payment.card) {
+                record.payment = order.payment;
+            }
+
+            record.save();
+        } else {
+            const record = new Record(data);
+            record.save();
+        }
+    });
+}
 
 module.exports = router;
