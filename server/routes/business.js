@@ -87,7 +87,9 @@ router.post('/update', auth.verifyToken ,function(req, res, next) {
             if(data.length > 1) {
                 res.status(400).json({error: 'Link index is taken'});
                 return;
-            }else if(data.length == 1 && data[0]._id !== business._id) {
+            }
+            
+            if(data.length === 1 && !data[0]._id.equals(business._id)) {
                 res.status(400).json({error: 'Link index is taken'});
                 return;
             }
