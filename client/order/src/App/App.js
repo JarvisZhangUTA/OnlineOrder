@@ -172,12 +172,14 @@ class App extends Component {
       fetch(request)
         .then((res) => res.json())
         .then((record) => {
-          if(record) {
+          if(record.address) {
             order.address = record.address;
-            order.payment = record.payment;
-            console.log(order);
-            this.setState({order});
           }
+
+          if(record.payment) {
+            order.payment = record.payment;
+          }
+          this.setState({order});
         });
     }
 
