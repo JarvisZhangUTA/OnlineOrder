@@ -290,10 +290,11 @@ class App extends Component {
     const arr = window.location.href.split('/');
     const index = arr[arr.length - 1];
     const url = 'http://' + window.location.hostname + ':' + window.location.port + '/' + index;
-    
+
     return (
       <div className="container">
         <div className="card red accent-2">
+          
           <div className="card-content white-text">
             <h4>
               <a href={url}>
@@ -303,6 +304,7 @@ class App extends Component {
             <p>{this.state.business.location.address}</p>
             <p>Contact with {this.state.business.phone} for more information.</p>
           </div>
+
           <div className="card-tabs">
             <ul className="tabs tabs-transparent">
               <li className="tab"><a href="#menu" class="active">&nbsp;&nbsp;MENU&nbsp;&nbsp;</a></li>
@@ -378,6 +380,7 @@ class App extends Component {
                 </thead>
                 <tbody>
                   {item_list}
+                  <tr><td></td><td></td><td></td><td></td><td></td></tr>
                 </tbody>
               </table>
 
