@@ -304,9 +304,9 @@ class App extends Component {
             <p>Contact with {this.state.business.phone} for more information.</p>
           </div>
           <div className="card-tabs">
-            <ul className="tabs tabs-fixed-width tabs-transparent">
-              <li className="tab"><a href="#menu" class="active">MENU</a></li>
-              <li className="tab"><a href="#cart" >CART</a></li>
+            <ul className="tabs tabs-transparent">
+              <li className="tab"><a href="#menu" class="active">&nbsp;&nbsp;MENU&nbsp;&nbsp;</a></li>
+              <li className="tab"><a href="#cart" >&nbsp;&nbsp;CART&nbsp;&nbsp;</a></li>
             </ul>
           </div>
           <div className="card-content white">
