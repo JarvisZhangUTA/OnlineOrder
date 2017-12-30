@@ -4,6 +4,7 @@ import FaMinus from 'react-icons/lib/fa/minus-circle';
 import { ToastContainer, toast } from 'react-toastify';
 import validator from 'validator';
 import * as jsPDF from 'jspdf';
+import $ from 'jquery';
 
 import 'materialize-css/dist/css/materialize.min.css';
 import 'materialize-css/dist/js/materialize.min';
@@ -159,6 +160,8 @@ class App extends Component {
               this.setState({
                   business: business
               });
+
+              $('.collapsible').collapsible('open', 0);
           });
   }
 
@@ -386,24 +389,26 @@ class App extends Component {
       <div>
         <ul className="collapsible" data-collapsible="accordion">
           <li>
-            <div className="collapsible-header grey lighten-4 active">Order</div>
+            <div className="collapsible-header grey lighten-4">Order</div>
             <div className="collapsible-body">
-              <table className="responsive-table centered">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Count</th>
-                    <th>Instructions</th>
-                    <th>Subtotal</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {item_list}
-                  <tr><td></td><td></td><td></td><td></td><td></td></tr>
-                </tbody>
-              </table>
-
+              <div>
+                <table className="responsive-table centered">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Price</th>
+                      <th>Count</th>
+                      <th>Instructions</th>
+                      <th>Subtotal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {item_list}
+                    <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              
               <div>
                   <p className="right-align">Tax: {this.state.order.tax}</p>
                   <p className="right-align">Total: {this.state.order.total}</p>
@@ -470,7 +475,7 @@ class App extends Component {
                     <td>{i.name}</td>
                     <td>{i.price}</td>
                     <td>
-                        <a onClick={() => this.addItem(i1, i2)} class="waves-effect waves-teal btn-flat">
+                        <a onClick={() => this.addItem(i1, i2)} className="waves-effect waves-teal btn-flat">
                             <FaPlus/>
                         </a>
                     </td>
@@ -480,10 +485,10 @@ class App extends Component {
 
           return (
             <li>
-              <div class="collapsible-header">
+              <div className="collapsible-header">
                 {catalog.name}
               </div>
-              <div class="collapsible-body">
+              <div className="collapsible-body">
                 <table>
                   {items}
                 </table>
