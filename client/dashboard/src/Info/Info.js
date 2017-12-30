@@ -235,7 +235,6 @@ class Info extends React.Component {
         const business = this.state.business;
         business.location = location;
         this.setState({business});
-        console.log(this.state.business.location);
     }
 
     onAddressWillChange(e) {

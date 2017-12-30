@@ -18,7 +18,7 @@
     "react-textarea-autosize": "^5.2.1",
     "recompose": "^0.26.0",
     "sweetalert-react": "^0.4.10",
-    "validator": "^9.1.1"
+    "validator": "^9.2.0"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -21,7 +21,7 @@ class App extends Component {
             email: '',
             phone: '',
             location: {address: ''},
-            item: []
+            catalog: []
           },
           order: {
             phone: '',
@@ -242,8 +242,8 @@ class App extends Component {
     this.setState({order});
   }
 
-  addItem(index) {
-    const item = this.state.business.item[index];
+  addItem(i1, i2) {
+    const item = this.state.business.catalog[i1].item[i2];
     const order = this.state.order;
 
     const i = order.item.indexOf(item);
@@ -462,29 +462,41 @@ class App extends Component {
   }
 
   renderMenu() {
-    const item_list = this.state.business.item.map(
-      (i, index) => {
+    const item_list = this.state.business.catalog.map(
+      (catalog, i1) => {
+          const items = catalog.item.map((i, i2) => {
+              return (
+                <table>
+                  <tr>
+                    <td>{i.name}</td>
+                    <td>{i.price}</td>
+                    <td>
+                        <a onClick={() => this.addItem(i1, i2)} class="waves-effect waves-teal btn-flat">
+                            <FaPlus/>
+                        </a>
+                    </td>
+                  </tr>
+                </table>
+              );
+          });
+
           return (
-              <tr>
-                  <td>{i.name}</td>
-                  <td>{i.price}</td>
-                  <td>
-                      <a onClick={() => this.addItem(index)} class="waves-effect waves-teal btn-flat">
-                          <FaPlus/>
-                      </a>
-                  </td>
-              </tr>
+            <li>
+              <div class="collapsible-header">
+                {catalog.name}
+              </div>
+              <div class="collapsible-body">
+                {items}
+              </div>
+            </li>
           );
       }
     );
 
     return (
-      <table>
-        <thead>
-          <tr><th>Name</th><th>Price</th><th></th></tr>
-        </thead>
-        <tbody>{item_list}</tbody>
-      </table>
+      <ul class="collapsible" data-collapsible="accordion">
+        {item_list}
+      </ul>
     );
   }
 

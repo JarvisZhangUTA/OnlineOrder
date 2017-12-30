@@ -25,3 +25,17 @@ a {
 a :hover {
   color: black;
 }
+
+tr {
+  margin: 0;
+  padding: 0;
+}
+
+td {
+  margin: 0;
+  padding: 5px;
+}
+
+.collapsible-body {
+  padding: 5px 10px;
+}

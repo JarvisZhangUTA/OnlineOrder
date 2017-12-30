@@ -2,3 +2,4 @@
 ./client/dashboard/node_modules
 ./client/order/node_modules
 ./server/node_modules
+./server/public

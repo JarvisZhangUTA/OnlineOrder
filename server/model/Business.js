@@ -22,10 +22,13 @@ var schema = new mongoose.Schema({
         lat: Number,
         lng: Number
     },
-    item:[{
+    catalog:[{
         name: String,
-        price: Number,
-        tags: [String] 
+        item:[{
+            name: String,
+            price: Number,
+            tags: [String] 
+        }]
     }],
     notification: [String]
 },{collection: 'Business'});

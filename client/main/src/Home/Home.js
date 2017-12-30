@@ -20,7 +20,7 @@ class Home extends React.Component {
                         </a>
                         <ul className="right hide-on-med-and-down">
                         <li>
-                            <a href={'/dashboard/Signin'}>Start Now</a>
+                            <a href={'/dashboard/Signin'}>Sign In</a>
                         </li>
                         </ul>
                     </div>

@@ -1,0 +1,12 @@
+td {
+    padding: 5px;
+}
+
+.input_field {
+    margin-top: 0;
+}
+
+.clear-margin {
+    margin: 0;
+    padding: 0;
+}
