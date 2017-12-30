@@ -1,5 +1,6 @@
 import React from 'react';
 import SweetAlert from 'sweetalert-react';
+import { ToastContainer, toast } from 'react-toastify';
 import $ from 'jquery';
 import './Item.css';
 
@@ -92,7 +93,7 @@ class Items extends React.Component {
 
     removeItem(index) {
         const business = this.state.business;
-        business.catalog[this.state.cur_catalog].splice(index, 1);
+        business.catalog[this.state.cur_catalog].item.splice(index, 1);
         this.setState({business});
         this.updateBusiness();
     }
@@ -137,11 +138,11 @@ class Items extends React.Component {
             body: JSON.stringify(this.state.business)
         }).then(response=>{
             if(response.status === 200){
-                this.alert('Success', 'Change Saved');
+                toast('Change Saved');
             } else {
                 // 失败
                 response.json().then((res)=>{
-                    this.alert('Error Happened', res.error);
+                    toast('Error Happened:'+res.error);
                 });
             }
         });
@@ -264,6 +265,15 @@ class Items extends React.Component {
                     title={this.state.alert.title}
                     text={this.state.alert.text}
                     onConfirm={() => this.setState({ alert:{show: false}})}
+                />
+
+                <ToastContainer 
+                    position="bottom-right"
+                    autoClose={2000}
+                    hideProgressBar={true}
+                    newestOnTop={false}
+                    closeOnClick
+                    pauseOnHover
                 />
             </div>
         );

@@ -466,7 +466,6 @@ class App extends Component {
       (catalog, i1) => {
           const items = catalog.item.map((i, i2) => {
               return (
-                <table>
                   <tr>
                     <td>{i.name}</td>
                     <td>{i.price}</td>
@@ -476,7 +475,6 @@ class App extends Component {
                         </a>
                     </td>
                   </tr>
-                </table>
               );
           });
 
@@ -486,7 +484,9 @@ class App extends Component {
                 {catalog.name}
               </div>
               <div class="collapsible-body">
-                {items}
+                <table>
+                  {items}
+                </table>
               </div>
             </li>
           );
