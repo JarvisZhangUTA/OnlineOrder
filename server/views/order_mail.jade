@@ -13,6 +13,12 @@ html
           li 
             p #{order.item[i].name} * #{order.item[i].count}
             p #{order.item[i].addition}
+            - if(order.item[i].sub && order.item[i].sub.length > 0)
+              ul
+                - for (var j = 0; j < order.item[i].sub.length; ++j) {
+                    - if(order.item[i].sub[j].count > 0)
+                      li #{order.item[i].sub[j].name} * #{order.item[i].sub[j].count}
+                - }
         - } 
       p tax: #{order.tax}
       p total: #{order.total}

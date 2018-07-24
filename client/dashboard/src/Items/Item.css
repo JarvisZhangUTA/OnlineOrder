@@ -10,3 +10,29 @@ td {
     margin: 0;
     padding: 0;
 }
+
+.right-float {
+    float: right;
+}
+
+.item-text {
+    line-height: 36px;
+    font-size: 1rem;
+}
+
+.full-width {
+    width:100%;
+}
+
+.no-margin {
+    margin: 0 !important;
+}
+
+.items-title {
+    font-size: 20px;
+    line-height: 30px;
+}
+
+.row {
+    margin-bottom: 0 !important;
+}

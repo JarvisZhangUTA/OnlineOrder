@@ -27,9 +27,7 @@ router.post('/placeorder', function(req, res, next) {
                     subject: 'New Order Notification', // REQUIRED.
                     order: order // All additional properties are also passed to the template as local variables.
                 }, (err) => {
-                    if(err){
-                        res.status(400).json({error: err});
-                    }
+                    if(err){ res.status(400).json({error: err}); }
 
                     res.json(order);
                     saveRecord(order);

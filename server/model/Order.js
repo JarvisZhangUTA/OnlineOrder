@@ -8,7 +8,12 @@ var schema = new mongoose.Schema({
         name: String,
         count: Number,
         price: Number,
-        addition: String
+        addition: String,
+        sub: [{
+            name: String,
+            price: Number,
+            count: Number
+        }]
     }],
     tax: Number,
     total: Number,

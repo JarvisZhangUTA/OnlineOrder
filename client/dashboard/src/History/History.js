@@ -3,6 +3,7 @@ import * as moment from 'moment';
 import * as jsPDF from 'jspdf';
 import './History.css';
 import $ from 'jquery'; 
+import { ExportToCsv } from 'export-to-csv';
 
 class History extends React.Component {
 
@@ -58,59 +59,55 @@ class History extends React.Component {
     }
 
     print() {
-        let doc = new jsPDF()
-
-        let content = '';
-        let lines = 1;
-        content += 'Order History from ' + this.state.startDate + ' to ' + this.state.endDate + '\n';
-        
+        const options = { 
+            fieldSeparator: ',',
+            quoteStrings: '"',
+            decimalseparator: '.',
+            showLabels: true, 
+            filename: 'order_history_' + new Date().toISOString().substring(0, 10),
+            useBom: true,
+            useKeysAsHeaders: false
+        };
+    
         const orders = this.state.orders;
-        for(let order of orders) {
-            content += '==========================================\n';
-            content += 'Order ID : ' + order._id + '\n';
-            content += '==========================================\n';
-            content += moment(order.createAt).format() + '\n';
-            content += 'Phone:' + order.phone + '\n';
-            content += 'Items:\n';
-            
-            for(let item of order.item) {
-                content += item.name + ' ' + item.count + '\n';
-                lines++;
+    
+        const data = [
+            ['History', this.state.startDate, 'to', this.state.endDate, '']
+        ];
+        
+        orders.forEach(order => {
+            data.push(['', '', '', '', '']);
+            data.push(['Order id', order.business, '', '', '']);
+            data.push(['Items', 'Name', 'Count', 'Price', 'Additional Info']);
 
-                if(lines >= 40){
-                    doc.text(content, 10, 10);
-                    doc.addPage();
-                    content = '';
-                    lines = 0;
+            let total = 0;
+            order.item.forEach((item, idx) => {
+                data.push([idx, item.name, item.count, '$' + (item.count * item.price), item.addition]);
+                total += item.count * item.price;
+                if( item.sub ) {
+                item.sub.forEach(sub => {
+                    if( sub.count > 0 ) {
+                    data.push(['', sub.name, sub.count, '$' + (sub.count * sub.price), '']);
+                    total += sub.count * sub.price;
+                    }
+                });
                 }
-            }
-
-            content += 'Tax: ' + order.tax + '\n';
-            content += 'Total: ' + order.total + '\n Address: \n';
-            content += order.address.line1 + '\n';
-            content += order.address.line2 + '\n';
-            if(order.address.zipcode)
-                content += order.address.zipcode + ' ';
-            content += order.address.city +'\n Payment: \n';
+            });
+        
+            let tax = total * 0.08;
+            data.push(['Tax', '$'+tax, '', '', '']);
+            data.push(['Total','$'+total+tax, '', '', '']);
+            data.push(['Address', order.address.line1 + ' ' + order.address.line2 + ' ' + order.address.city + ' ' + order.address.zipcode, '', '', '']);
+            data.push(['Phone', order.phone, '', '', '']);
             if(order.payment.card) {
-                content += order.payment.card + '\n';
-                content += order.payment.name + '\n';
-            }   else {
-                content += 'Cash\n';
+                data.push(['Payment', '', '', '', '']);
+                data.push(['Card No', order.payment.card, '', '', '']);
+                data.push(['Expiry', order.payment.expiry, '', '', '']);
+                data.push(['Name', order.payment.name, '', '', '']); 
             }
-
-            lines += 15;
-
-            if(lines >= 40) {
-                doc.text(content, 10, 10);
-                doc.addPage();
-                content = '';
-                lines = 0;
-            }
-        }
-
-        doc.text(content, 10, 10);
-        doc.save('OrderHistory.pdf');
+        });
+      
+        new ExportToCsv(options).generateCsv(data);
     }
 
     loadOrders() {
@@ -261,18 +258,35 @@ class History extends React.Component {
     }
  
     renderItems(items) {
-        return items.map(
-            (item) => {
-                return (
-                    <tr>
-                        <td>{item.name}</td>
-                        <td>{item.price}</td>
-                        <td>{item.count}</td>
-                        <td>{item.addition}</td>
-                    </tr>
-                );
+        const res = [];
+
+        items.forEach(item => {
+            res.push(
+                <tr>
+                    <td>{item.name}</td>
+                    <td>{item.price}</td>
+                    <td>{item.count}</td>
+                    <td>{item.addition}</td>
+                </tr>
+            );
+
+            if( item.sub && item.sub.length > 0) {
+                item.sub.forEach(sub => {
+                    if( sub.count > 0 ) {
+                        res.push(
+                            <tr class="sub-tr">
+                                <td>{sub.name}</td>
+                                <td>{sub.price}</td>
+                                <td>{sub.count}</td>
+                                <td></td>
+                            </tr>
+                        );
+                    }
+                });
             }
-        )
+        });
+
+        return res;
     }
 } 
 

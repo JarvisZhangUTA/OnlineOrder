@@ -27,7 +27,11 @@ var schema = new mongoose.Schema({
         item:[{
             name: String,
             price: Number,
-            tags: [String] 
+            tags: [String],
+            sub: [{
+                name: String,
+                price: Number
+            }]
         }]
     }],
     notification: [String]

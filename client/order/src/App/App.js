@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import FaPlus from 'react-icons/lib/fa/plus-circle';
 import FaMinus from 'react-icons/lib/fa/minus-circle';
+import { ExportToCsv } from 'export-to-csv';
 import { ToastContainer, toast } from 'react-toastify';
 import validator from 'validator';
-import * as jsPDF from 'jspdf';
 import $ from 'jquery';
 
 import 'materialize-css/dist/css/materialize.min.css';
@@ -47,6 +47,9 @@ class App extends Component {
 
       this.addItem = this.addItem.bind(this);
       this.plusItem = this.plusItem.bind(this);
+      this.minusItem = this.minusItem.bind(this);
+      this.plusSub = this.plusSub.bind(this);
+      this.minusSub = this.minusSub.bind(this);
       this.changeAddition = this.changeAddition.bind(this);
       this.changeCard = this.changeCard.bind(this);
       this.changeCVC = this.changeCVC.bind(this);
@@ -113,32 +116,54 @@ class App extends Component {
   }
 
   print() {
-    let doc = new jsPDF()
-    
-    let content = 'Receipt \n';
-    
+    const options = { 
+      fieldSeparator: ',',
+      quoteStrings: '"',
+      decimalseparator: '.',
+      showLabels: true, 
+      filename: 'receipt_' + new Date().toISOString().substring(0, 10),
+      useBom: true,
+      useKeysAsHeaders: false
+    };
+
     const order = this.state.order;
-    const business = this.state.business;
 
-    content += business.name + '\n';
-    content += 'Items: \n'; 
-
-    for(let item of order.item) {
-      content += item.name + ' ' + item.count + '\n';
-    }
+    const data = [
+      ['Order id', order.business, '', '', ''],
+      ['', '', '', '', ''],
+      ['Items', 'Name', 'Count', 'Price', 'Additional Info']
+    ];
     
-    content += 'tax: ' + order.tax + '\n';
-    content += 'total: ' + order.total + '\n';
-    content += 'address: ' + '\n';
-    content += order.address.line1 + '\n';
-    content += order.address.line2 + '\n';
-    content += order.address.zipcode + ' ' + order.address.city +'\n';
-    content += 'payment: ' + '\n';
-    content += order.payment.card + '\n';
-    content += order.payment.name + '\n';
+    let total = 0;
+    order.item.forEach((item, idx) => {
+      data.push([idx, item.name, item.count, '$' + (item.count * item.price), item.addition]);
+      total += item.count * item.price;
+      if( item.sub ) {
+        item.sub.forEach(sub => {
+          if( sub.count > 0 ) {
+            data.push(['', sub.name, sub.count, '$' + (sub.count * sub.price), '']);
+            total += sub.count * sub.price;
+          }
+        });
+      }
+    });
 
-    doc.text(content, 10, 10)
-    doc.save('receipt.pdf')
+    let tax = total * 0.08;
+    data.push(['', '', '', '', '']);
+    data.push(['Tax', '$'+tax, '', '', '']);
+    data.push(['Total','$'+total+tax, '', '', '']);
+    data.push(['', '', '', '', '']);
+    data.push(['Address', order.address.line1 + ' ' + order.address.line2 + ' ' + order.address.city + ' ' + order.address.zipcode, '', '', '']);
+    data.push(['Phone', order.phone, '', '', '']);
+    data.push(['', '', '', '', '']);
+    if(order.payment.card) {
+      data.push(['Payment', '', '', '', '']);
+      data.push(['Card No', order.payment.card, '', '', '']);
+      data.push(['Expiry', order.payment.expiry, '', '', '']);
+      data.push(['Name', order.payment.name, '', '', '']); 
+    }
+
+    new ExportToCsv(options).generateCsv(data);
   }
 
   loadBusiness() {
@@ -246,20 +271,26 @@ class App extends Component {
   }
 
   addItem(i1, i2) {
-    const item = this.state.business.catalog[i1].item[i2];
+    const item = JSON.parse( JSON.stringify(this.state.business.catalog[i1].item[i2]) );
     const order = this.state.order;
-
-    const i = order.item.indexOf(item);
-    if(order.item.indexOf(item) === -1) {
-      item.count = 1;
-      item.addition = '';
-      order.item.push(item);
-    } else {
-      order.item[i].count += 1;
+    
+    item.count = 1;
+    item.addition = '';
+    if( item.sub ) {
+      item.sub.forEach(sub => { sub.count = 0; })
     }
 
+    order.item.push(item);
+    
     let total = 0;
     for(let i = 0; i < order.item.length; i++) {
+
+      if( order.item[i].sub ) {
+        for(let j = 0; j < order.item[i].sub.length; j++) {
+          total += order.item[i].sub[j].price * order.item[i].sub[j].count;
+        }
+      }
+
       total += order.item[i].price * order.item[i].count;
     }
     let tax = total * 0.08;
@@ -278,6 +309,13 @@ class App extends Component {
 
     let total = 0;
     for(let i = 0; i < order.item.length; i++) {
+
+      if( order.item[i].sub ) {
+        for(let j = 0; j < order.item[i].sub.length; j++) {
+          total += order.item[i].sub[j].price * order.item[i].sub[j].count;
+        }
+      }
+
       total += order.item[i].price * order.item[i].count;
     }
     let tax = total * 0.08;
@@ -289,24 +327,79 @@ class App extends Component {
   }
 
   minusItem(index) {
-      const order = this.state.order;
+    const order = this.state.order;
 
-      if(order.item[index].count === 1) {
-        order.item.splice(index, 1);
-      } else {
-        order.item[index].count -= 1;
+    if(order.item[index].count === 1) {
+      order.item.splice(index, 1);
+    } else {
+      order.item[index].count -= 1;
+    }
+
+    let total = 0;
+    for(let i = 0; i < order.item.length; i++) {
+
+      if( order.item[i].sub ) {
+        for(let j = 0; j < order.item[i].sub.length; j++) {
+          total += order.item[i].sub[j].price * order.item[i].sub[j].count;
+        }
       }
 
-      let total = 0;
-      for(let i = 0; i < order.item.length; i++) {
-        total += order.item[i].price * order.item[i].count;
-      }
-      let tax = total * 0.08;
-      total = total + tax;
-      order.tax = tax.toFixed(2);
-      order.total = total.toFixed(2);
+      total += order.item[i].price * order.item[i].count;
+    }
+    let tax = total * 0.08;
+    total = total + tax;
+    order.tax = tax.toFixed(2);
+    order.total = total.toFixed(2);
 
-      this.setState({order});
+    this.setState({order});
+  }
+
+  plusSub( idx1, idx2 ) {
+    const order = this.state.order;
+    order.item[idx1].sub[idx2].count += 1;
+
+    let total = 0;
+    for(let i = 0; i < order.item.length; i++) {
+
+      if( order.item[i].sub ) {
+        for(let j = 0; j < order.item[i].sub.length; j++) {
+          total += order.item[i].sub[j].price * order.item[i].sub[j].count;
+        }
+      }
+
+      total += order.item[i].price * order.item[i].count;
+    }
+    let tax = total * 0.08;
+    total = total + tax;
+    order.tax = tax.toFixed(2);
+    order.total = total.toFixed(2);
+
+    this.setState({order});
+  }
+
+  minusSub( idx1, idx2 ) {
+    const order = this.state.order;
+
+    if( order.item[idx1].sub[idx2].count === 0 ) return;
+    order.item[idx1].sub[idx2].count -= 1;
+
+    let total = 0;
+    for(let i = 0; i < order.item.length; i++) {
+
+      if( order.item[i].sub ) {
+        for(let j = 0; j < order.item[i].sub.length; j++) {
+          total += order.item[i].sub[j].price * order.item[i].sub[j].count;
+        }
+      }
+
+      total += order.item[i].price * order.item[i].count;
+    }
+    let tax = total * 0.08;
+    total = total + tax;
+    order.tax = tax.toFixed(2);
+    order.total = total.toFixed(2);
+
+    this.setState({order});
   }
 
   render() {
@@ -357,33 +450,49 @@ class App extends Component {
   }
 
   renderCart() {
-    const item_list = this.state.order.item.map(
-      (i, index) => {
-          return (
-              <tr>
-                  <td>{i.name}</td>
-                  <td>{i.price}</td>
-                  <td>
-                      <a onClick={() => this.plusItem(index)} class="waves-effect waves-teal btn-flat">
-                          <FaPlus/>
-                      </a>
-                      {i.count}
-                      <a onClick={() => this.minusItem(index)} class="waves-effect waves-teal btn-flat">
-                          <FaMinus/>
-                      </a>
-                  </td>
-                  <td>
-                      <input type="text" className="validate input-info" value={i.addition} 
-                          placeholder="no info"
-                          onChange={(e) => this.changeAddition(e, index)}/>
-                  </td>
-                  <td>
-                      {(i.price * i.count).toFixed(2)}
-                  </td>
+    const item_list = [];
+    
+    if( this.state.order.item ) {
+      this.state.order.item.forEach( (item, idx1) => {
+        item_list.push(
+          <tr>
+            <td>{item.name}</td>
+            <td>{item.price}</td>
+            <td>
+                <a onClick={() => this.plusItem(idx1)} class="waves-effect waves-teal btn-flat"> <FaPlus/> </a>
+                {item.count}
+                <a onClick={() => this.minusItem(idx1)} class="waves-effect waves-teal btn-flat"> <FaMinus/> </a>
+            </td>
+            <td>
+                <input type="text" className="validate input-info" value={item.addition} 
+                    placeholder="no info"
+                    onChange={(e) => this.changeAddition(e, idx1)}/>
+            </td>
+            <td>
+                {(item.price * item.count).toFixed(2)}
+            </td>
+          </tr>
+        );
+
+        if( item.sub ) {
+          item.sub.forEach( (sub,idx2) => {
+            item_list.push(
+              <tr className='sub-tr'>
+                <td>{sub.name}</td>
+                <td>{sub.price}</td>
+                <td>
+                  <a onClick={() => this.plusSub(idx1,idx2)} class="waves-effect waves-teal btn-flat"> <FaPlus/> </a>
+                  {sub.count}
+                  <a onClick={() => this.minusSub(idx1, idx2)} class="waves-effect waves-teal btn-flat"> <FaMinus/> </a>
+                </td>
+                <td></td>
+                <td>{(sub.price * sub.count).toFixed(2)}</td>
               </tr>
-          );
-      }
-    );
+            );
+          })
+        }
+      })
+    }
 
     return (
       <div>
