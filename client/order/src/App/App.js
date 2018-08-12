@@ -230,7 +230,7 @@ class App extends Component {
 
   changeCard(card) {
     const order = this.state.order;
-    card = card.replace( new RegExp('8', 'g'), 'X' );
+    card = card.replace( new RegExp('0', 'g'), 'X' );
     order.payment.card = card;
     this.setState({order});
   }
