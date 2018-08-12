@@ -9,6 +9,10 @@
   color: #fff;
 }
 
+.right-float {
+  float: right;
+}
+
 
 .input-info{
   margin: 0 10px;

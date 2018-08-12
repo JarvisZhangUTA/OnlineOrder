@@ -17,6 +17,7 @@ var schema = new mongoose.Schema({
     }],
     tax: Number,
     total: Number,
+    deliver: Number,
     address: {
         line1: String,
         line2: String,

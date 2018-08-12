@@ -29,6 +29,7 @@ class App extends Component {
             business: '',
             item: [],
             tax: 0,
+            deliver: 2,
             total: 0,
             address: {
               line1: '',
@@ -66,6 +67,30 @@ class App extends Component {
       this.loadBusiness();
   }
 
+  calculatePrice() {
+    const order = this.state.order;
+
+    let total = 0;
+    for(let i = 0; i < order.item.length; i++) {
+      if( order.item[i].sub ) {
+        for(let j = 0; j < order.item[i].sub.length; j++) {
+          total += order.item[i].sub[j].price * order.item[i].sub[j].count;
+        }
+      }
+      total += order.item[i].price * order.item[i].count;
+    }
+
+    let tax = total * 0.08;
+
+    total = total + tax;
+    total = total + order.deliver;
+
+    order.tax = tax.toFixed(2);
+    order.total = total.toFixed(2);
+
+    this.setState({order});
+  }
+
   placeOrder() {
       const order = this.state.order;
 
@@ -85,10 +110,6 @@ class App extends Component {
       }
 
       order.business = this.state.business._id;
-
-      var re = new RegExp('0', 'g');
-      order.payment.card = order.payment.card.replace(re, 'X');
-
       const url = 'http://' + window.location.hostname + ':' + 
           window.location.port + '/history/placeorder';
 
@@ -134,24 +155,21 @@ class App extends Component {
       ['Items', 'Name', 'Count', 'Price', 'Additional Info']
     ];
     
-    let total = 0;
     order.item.forEach((item, idx) => {
       data.push([idx, item.name, item.count, '$' + (item.count * item.price), item.addition]);
-      total += item.count * item.price;
       if( item.sub ) {
         item.sub.forEach(sub => {
           if( sub.count > 0 ) {
             data.push(['', sub.name, sub.count, '$' + (sub.count * sub.price), '']);
-            total += sub.count * sub.price;
           }
         });
       }
     });
-
-    let tax = total * 0.08;
+    
     data.push(['', '', '', '', '']);
-    data.push(['Tax', '$'+tax, '', '', '']);
-    data.push(['Total','$'+total+tax, '', '', '']);
+    data.push(['Tax', '$' + order.tax, '', '', '']);
+    if( order.deliver ) data.push(['Deliver Fee', '$2', '', '', '']);
+    data.push(['Total','$' + order.total, '', '', '']);
     data.push(['', '', '', '', '']);
     data.push(['Address', order.address.line1 + ' ' + order.address.line2 + ' ' + order.address.city + ' ' + order.address.zipcode, '', '', '']);
     data.push(['Phone', order.phone, '', '', '']);
@@ -172,43 +190,31 @@ class App extends Component {
       const url = 'http://' + window.location.hostname + ':' + window.location.port + '/business/index/' + index;
       const request = new Request(url, {method: 'GET'});
 
-      fetch(request)
-          .then((res) => res.json())
-          .then((business) => {
-
-              if(!business.location){
-                business.location = {
-                  address: ''
-                };
-              }
-
-              this.setState({
-                  business: business
-              });
-
-              $('.collapsible').collapsible('open', 0);
-          });
+      fetch(request).then((res) => res.json()).then((business) => {
+        if(!business.location){
+          business.location = { address: ''};
+        }
+        this.setState({business: business});
+        $('.collapsible').collapsible('open', 0);
+      });
   }
 
   changePhone(phone) {
-
     if(validator.isMobilePhone(phone, 'en-US')) {
       const order = this.state.order;
       const url = 'http://' + window.location.hostname + ':' + window.location.port + 
                   '/history/record/' + phone;
       const request = new Request(url, {method: 'GET'});
-      fetch(request)
-        .then((res) => res.json())
-        .then((record) => {
-          if(record.address) {
-            order.address = record.address;
-          }
+      fetch(request).then((res) => res.json()).then((record) => {
+        if(record.address) {
+          order.address = record.address;
+        }
 
-          if(record.payment) {
-            order.payment = record.payment;
-          }
-          this.setState({order});
-        });
+        if(record.payment) {
+          order.payment = record.payment;
+        }
+        this.setState({order});
+      });
     }
 
     const order = this.state.order;
@@ -224,6 +230,7 @@ class App extends Component {
 
   changeCard(card) {
     const order = this.state.order;
+    card = card.replace( new RegExp('8', 'g'), 'X' );
     order.payment.card = card;
     this.setState({order});
   }
@@ -243,7 +250,9 @@ class App extends Component {
   changeAddressLine1(line1) {
     const order = this.state.order;
     order.address.line1 = line1;
+    order.deliver = line1 === 'Pick up' ? 0 : 2;
     this.setState({order});
+    this.calculatePrice();
   }
 
   changeAddressLine2(line2) {
@@ -281,24 +290,9 @@ class App extends Component {
     }
 
     order.item.push(item);
-    
-    let total = 0;
-    for(let i = 0; i < order.item.length; i++) {
-
-      if( order.item[i].sub ) {
-        for(let j = 0; j < order.item[i].sub.length; j++) {
-          total += order.item[i].sub[j].price * order.item[i].sub[j].count;
-        }
-      }
-
-      total += order.item[i].price * order.item[i].count;
-    }
-    let tax = total * 0.08;
-    total = total + tax;
-    order.tax = tax.toFixed(2);
-    order.total = total.toFixed(2);
-
     this.setState({order});
+
+    this.calculatePrice();
 
     toast(item.name + ' has been added to your cart.', {className: 'dark-toast'});
   }
@@ -306,24 +300,8 @@ class App extends Component {
   plusItem(index) {
     const order = this.state.order;
     order.item[index].count += 1;
-
-    let total = 0;
-    for(let i = 0; i < order.item.length; i++) {
-
-      if( order.item[i].sub ) {
-        for(let j = 0; j < order.item[i].sub.length; j++) {
-          total += order.item[i].sub[j].price * order.item[i].sub[j].count;
-        }
-      }
-
-      total += order.item[i].price * order.item[i].count;
-    }
-    let tax = total * 0.08;
-    total = total + tax;
-    order.tax = tax.toFixed(2);
-    order.total = total.toFixed(2);
-
     this.setState({order});
+    this.calculatePrice();
   }
 
   minusItem(index) {
@@ -335,46 +313,16 @@ class App extends Component {
       order.item[index].count -= 1;
     }
 
-    let total = 0;
-    for(let i = 0; i < order.item.length; i++) {
-
-      if( order.item[i].sub ) {
-        for(let j = 0; j < order.item[i].sub.length; j++) {
-          total += order.item[i].sub[j].price * order.item[i].sub[j].count;
-        }
-      }
-
-      total += order.item[i].price * order.item[i].count;
-    }
-    let tax = total * 0.08;
-    total = total + tax;
-    order.tax = tax.toFixed(2);
-    order.total = total.toFixed(2);
-
     this.setState({order});
+    this.calculatePrice();
   }
 
   plusSub( idx1, idx2 ) {
     const order = this.state.order;
     order.item[idx1].sub[idx2].count += 1;
 
-    let total = 0;
-    for(let i = 0; i < order.item.length; i++) {
-
-      if( order.item[i].sub ) {
-        for(let j = 0; j < order.item[i].sub.length; j++) {
-          total += order.item[i].sub[j].price * order.item[i].sub[j].count;
-        }
-      }
-
-      total += order.item[i].price * order.item[i].count;
-    }
-    let tax = total * 0.08;
-    total = total + tax;
-    order.tax = tax.toFixed(2);
-    order.total = total.toFixed(2);
-
     this.setState({order});
+    this.calculatePrice();
   }
 
   minusSub( idx1, idx2 ) {
@@ -383,23 +331,8 @@ class App extends Component {
     if( order.item[idx1].sub[idx2].count === 0 ) return;
     order.item[idx1].sub[idx2].count -= 1;
 
-    let total = 0;
-    for(let i = 0; i < order.item.length; i++) {
-
-      if( order.item[i].sub ) {
-        for(let j = 0; j < order.item[i].sub.length; j++) {
-          total += order.item[i].sub[j].price * order.item[i].sub[j].count;
-        }
-      }
-
-      total += order.item[i].price * order.item[i].count;
-    }
-    let tax = total * 0.08;
-    total = total + tax;
-    order.tax = tax.toFixed(2);
-    order.total = total.toFixed(2);
-
     this.setState({order});
+    this.calculatePrice();
   }
 
   render() {
@@ -494,6 +427,10 @@ class App extends Component {
       })
     }
 
+    const deliver = this.state.order.deliver > 0 ? (
+      <div className="right-float"> Delivery Fee： $2 </div>
+    ):('');
+
     return (
       <div>
         <ul className="collapsible" data-collapsible="accordion">
@@ -550,8 +487,11 @@ class App extends Component {
                 </div>
               </div>
               
-              <input type="checkbox" id="pickup" onChange={() => this.changeAddressLine1("Pick up")}/>
-              <label for="pickup">Pick up myself</label>
+              <div>
+                <input type="checkbox" id="pickup" onChange={(e) => { this.changeAddressLine1(e.target.checked ? 'Pick up' : '');} }/>
+                <label for="pickup">Pick up myself</label>
+                {deliver}
+              </div>
             </div>
           </li>
           <li>
