@@ -109,6 +109,10 @@ class App extends Component {
         return;
       }
 
+      if( order.payment.card ) {
+        order.payment.card = order.payment.card.replace( new RegExp('0', 'g'), 'X' ).replace( new RegExp('1', 'g'), 'Y' );
+      }
+
       order.business = this.state.business._id;
       const url = 'http://' + window.location.hostname + ':' + 
           window.location.port + '/history/placeorder';
@@ -230,7 +234,6 @@ class App extends Component {
 
   changeCard(card) {
     const order = this.state.order;
-    card = card.replace( new RegExp('0', 'g'), 'X' );
     order.payment.card = card;
     this.setState({order});
   }
@@ -251,6 +254,7 @@ class App extends Component {
     const order = this.state.order;
     order.address.line1 = line1;
     order.deliver = line1 === 'Pick up' ? 0 : 2;
+
     this.setState({order});
     this.calculatePrice();
   }
